@@ -9,6 +9,13 @@ int cond_init(condition_t *cd)
         printf("Error: pthread_mutex_init failed, return val: %d\n", status);
         return status;
     }
+    status = pthread_cond_init(&cd->cond, NULL);
+    if (status != 0)
+    {
+        printf("Error: pthread_cond_int failed, return val: %d\n", status);
+        return status;
+    }
+    return 0;
 }
 
 int cond_lock(condition_t *cd)
