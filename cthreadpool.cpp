@@ -25,10 +25,46 @@ void cthreadpool_init(cthreadpool_t *tp, int thread_nums)
 
 void cthreadpool_add_task(cthreadpool_t *tp, void *(*run)(void *args), void *arg)
 {
-    
+    task_t *new_task = reinterpret_cast<task_t *>(malloc(sizeof(task_t)));
+    new_task->run = run;
+    new_task->arg = arg;
+    new_task->next = NULL;
+    cond_lock(&tp->ready);
+    if (tp->head == NULL)
+        tp->head = new_task;
+    else
+        tp->tail->next = new_task;
+    tp->tail = new_task;
+    if (tp->idle > 0)
+        cond_signal(&tp->ready);
+    else if (tp->counter < tp->max_threads)
+    {
+        pthread_t tid;
+        pthread_create(&tid, NULL, thread_routine, tp);
+        tp->counter++;
+    }
+    else
+        printf("Warn: no idle thread, please wait ...\n");
+    cond_unlock(&tp->ready);
 }
 
-void cthreadpool_destroy(cthreadpool_t *tp);
+
+void cthreadpool_destroy(cthreadpool_t *tp)
+{
+    if (tp->quit)
+        return;
+    cond_lock(&tp->ready);
+    tp->quit = 1;
+    if (tp->counter > 0)
+    {
+        if (tp->idle > 0)
+            cond_broadcast(&tp->ready);
+    }
+    while (tp->counter > 0)
+        cond_wait(&tp->ready);
+    cond_unlock(&tp->ready);
+    cond_destroy(&tp->ready);
+}
 
 void *thread_routine(void *arg)
 {
