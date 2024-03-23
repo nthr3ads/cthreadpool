@@ -10,9 +10,24 @@ void *thread_routine(void *arg);
 
 void cthreadpool_init(cthreadpool_t *tp, int thread_nums)
 {
+    int n_sta = cond_init(&tp->ready);
+    if (n_sta == 0)
+        printf("Info : init the thread pool success!\n");
+    else
+        printf("Error: init the thread pool failed, status: %d\n", n_sta);
+    tp->head = NULL;
+    tp->tail = NULL;
+    tp->counter = 0;
+    tp->idle = 0;
+    tp->max_threads = thread_nums;
+    tp->quit = 0;
+}
+
+void cthreadpool_add_task(cthreadpool_t *tp, void *(*run)(void *args), void *arg)
+{
     
 }
-void cthreadpool_add_task(cthreadpool_t *tp, void *(*run)(void *args), void *arg);
+
 void cthreadpool_destroy(cthreadpool_t *tp);
 
 void *thread_routine(void *arg)
