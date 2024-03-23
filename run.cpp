@@ -7,7 +7,7 @@
 
 void *my_task_func_call(void *arg)
 {
-    printf("Info: thread %ld is working on task %d\n", (u_int64_t) pthread_self(), *reinterpret_cast<int *>(arg));
+    printf("Info: thread %ld is working on task %d\n", (u_int64_t)pthread_self(), *reinterpret_cast<int *>(arg));
     sleep(5);
     free(arg);
     return NULL;

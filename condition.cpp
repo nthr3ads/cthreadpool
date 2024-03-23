@@ -25,7 +25,7 @@ int cond_lock(condition_t *cd)
 
 int cond_unlock(condition_t *cd)
 {
-    return pthread_mutex_unlock(&cd->mtx);    
+    return pthread_mutex_unlock(&cd->mtx);
 }
 
 int cond_wait(condition_t *cd)

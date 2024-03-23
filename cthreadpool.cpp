@@ -48,7 +48,6 @@ void cthreadpool_add_task(cthreadpool_t *tp, void *(*run)(void *args), void *arg
     cond_unlock(&tp->ready);
 }
 
-
 void cthreadpool_destroy(cthreadpool_t *tp)
 {
     if (tp->quit)
@@ -70,7 +69,7 @@ void *thread_routine(void *arg)
 {
     struct timespec abs;
     bool timeout;
-    printf("Info: create thread, and the thread id is: %ld\n", (u_int64_t) pthread_self());
+    printf("Info: create thread, and the thread id is: %ld\n", (u_int64_t)pthread_self());
     cthreadpool_t *pool = reinterpret_cast<cthreadpool_t *>(arg);
     while (true)
     {
@@ -79,13 +78,13 @@ void *thread_routine(void *arg)
         pool->idle++;
         while (pool->head == NULL && !pool->quit)
         {
-            printf("Info: thread %ld is waiting for a task\n", (u_int64_t) pthread_self());
+            printf("Info: thread %ld is waiting for a task\n", (u_int64_t)pthread_self());
             clock_gettime(CLOCK_REALTIME, &abs);
             abs.tv_sec += 2;
             int status = cond_record_wait_time(&pool->ready, &abs);
             if (status == ETIMEDOUT)
             {
-                printf("Info: thread %ld wait timed out \n", (u_int64_t) pthread_self());
+                printf("Info: thread %ld wait timed out \n", (u_int64_t)pthread_self());
                 timeout = true;
                 break;
             }
@@ -116,6 +115,6 @@ void *thread_routine(void *arg)
         }
         cond_unlock(&pool->ready);
     }
-        printf("Info : thread %ld quit\n", (u_int64_t) pthread_self());
-        return NULL;
+    printf("Info : thread %ld quit\n", (u_int64_t)pthread_self());
+    return NULL;
 }
